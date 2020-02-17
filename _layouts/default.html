@@ -9,19 +9,20 @@
   {% include head.html %}
 
   <body>
+
     {% include gtm_iframe.html %}
     <header>
         <div class="inner clearfix">
             <h1>
               <a href="/" class="external-link">
-                <strong>analytics</strong>.usa.gov
+                <strong>analytics</strong>.delaware.gov
               </a>
             </h1>
             <ul class="links">
-              <li><a href="#explanation">About <span class="sm-hide">this site</span></a></li>
-              <li><a href="{{ site.url }}{% if page.slug %}/{{ page.slug }}{% endif %}/data/">Data</a> | <a href="https://open.gsa.gov/api/dap/" target="_blank">API</a></li>
+              <li><a href="#explanation">About <span class="sm-hide">this site</span></a></li> {% capture slug_size %}{{ page.slug | size }}{% endcapture %}
+              <li><a href="{{ site.url }}{% if  slug_size != '0' %}{{ page.slug }}/{% endif %}data/">Data</a></li>
             </ul>
-            {% assign agencies = site.agencies | sort:"name"  %}
+            {% assign agencies = site.agencies | sort:"name_dropdown"  %}
             {% if agencies.size > 0 %}
               {% unless page.url contains 'data' %}
                 <div class="agency-selector-wrap">
@@ -30,7 +31,7 @@
                     <select name="agency-selector" id="agency-selector" title="Agency Selection Dropdown">
                       <option value="{{site.baseurl}}/">{{site.dropdown_title}}</option>
                       {% for agency in agencies %}
-                        <option value="{{site.baseurl}}{{agency.url}}">{{agency.name}}</option>
+                        <option value="{{site.baseurl}}{{agency.url}}">{{agency.name_dropdown}}</option>
                       {% endfor %}
                     </select>
                   </form>

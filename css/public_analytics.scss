@@ -39,7 +39,6 @@ $mobile-small-screen:  new-breakpoint(max-width  500px   1);
 
 $red: #981b1e;
 $light-blue: #0071bc;
-$light-blue-two: #2b75b9;
 $dark-blue: #112e51;
 $light-gray: #f9f9f9;
 $uswds-light-gray: #aeb0b5;
@@ -306,7 +305,6 @@ header {
 }
 
 #agency-selector {
-  height: auto;
   width: 100%;
   max-width: none; // USWDS override
   font-size: 22px;
@@ -321,7 +319,7 @@ header #agency-selector {
   background-image: url('../css/img/arrow-down.png');
   background-image: url('../css/img/arrow-down.svg');
   color: $white;
-  background-color: $light-blue-two;
+  background-color: $dark-blue;
   border: 1px solid $white;
 }
 
@@ -334,7 +332,7 @@ section {
   background: $white;
   padding: 1em;
     #current_visitors {
-    font-size: 8em;
+    font-size: 6em;
     margin: 0;
     @include media($small-screen) {
       font-size: 6em;
@@ -500,7 +498,7 @@ section {
   padding-top: 0em;
   padding-bottom: 2em;
   .chart_subtitle {
-    font-size: 2.1em;
+    font-size: 2em;
     font-weight: 300;
   }
 }
@@ -757,89 +755,4 @@ figure figure {
   &.loading {
     opacity: .8;
   }
-
-  
 }
-
-footer {
-  clear: both;
-
-  h3 {
-    margin-top: 0;
-  }
-
-  .logo-links {
-    margin-bottom: 0rem;
-    margin-right: 2rem;
-    float: left;
-    }
-
-    img {
-      width: 3.2rem;
-    }
-
-    img.github-icon {
-         width: 2.2rem !important;
-         vertical-align: text-bottom !important;
-      }
-
-  }
-
-.footer-main-img {
-  display: none;
-  max-width: 18.1rem;
-
-  @include media($large-screen) {
-    display: block;
-  }
-}
-
-.footer-content {
-  p {
-    max-width: 75ch;
-  }
-}
-
-.footer-contact-links {
-  margin-top: 3rem;
-
-  a {
-    color: $white;
-    text-decoration: underline;
-  }
-
-  img {
-    width: 4rem;
-  }
-
-}
-
-.footer-section-top {
-  @include padding(1.6rem null 1.3rem null);
-  background-color: $light-gray;
-}
-
-.footer-section-bottom {
-  @include padding(1.6rem null 1.3rem null);
-  background-color: $dark-blue;
-
-  p {
-    color: $white;
-    margin-top: 0;
-    font-size: 1.4rem;
-    line-height: 0.75;
-
-    &:first-of-type {
-      @include media($medium-screen) {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  a {
-    color: $white;
-    display: inline-block;
-    line-height: 0;
-  }
-}
-

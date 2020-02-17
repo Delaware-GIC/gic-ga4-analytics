@@ -1,6 +1,5 @@
 
-url: http://localhost:4000
-
+url: https://analytics.delaware.gov/
 # Use production data by default.
 # To pull from dev data for home page, uncomment:
-# data_url: http://localhost:4000/fake-data
+data_url: https://analytics.delaware.gov/data

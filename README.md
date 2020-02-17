@@ -12,30 +12,24 @@ Other organizations who have reused this project for their analytics dashboard:
 
 |                                                                           |                                                                                        |
 |:-------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------:|
-| [The City of Anchorage, AK](http://analytics.muni.org/)                   | [The City of Boulder, CO](https://bouldercolorado.gov/stats) 
-| [The City of Los Angeles, CA](http://webanalytics.lacity.org/)            | [The City of New Orleans, LA](http://webanalytics.nola.gov/) 
-| [The City of New Orleans, LA](http://webanalytics.nola.gov/)              | [The City of Omaha, NE](https://analytics.cityofomaha.org/) 
-| [The City of Omaha, NE](https://analytics.cityofomaha.org/)               | [The City of San Francisco, CA](http://analytics.sfgov.org/) 
-| [The City of Philadelphia, PA](http://analytics.phila.gov/)               | [The City of Santa Monica, CA](http://analytics.smgov.net/) 
-| [The City of Sacramento, CA](http://analytics.cityofsacramento.org/)      | [Carbarrus County, NC](http://analytics.cabarruscounty.us/) 
+| [The City of Anchorage, AK](http://analytics.muni.org/)                   | [The Town of Apex, NC](http://apexnc.seamlessreports.com/)                             |
+| [The City of Boulder, CO](https://bouldercolorado.gov/stats)              | [The City of Chesapeake, VA](http://cityofchesapeakeva.seamlessreports.com/)           |
+| [The City of Concord, NC](http://concordnc.seamlessreports.com/)          | [The City of Eagle Mountain, UT](http://eaglemountaincityut.seamlessreports.com/)      |
+| [The City of Evanston, IL](http://evanstonil.seamlessreports.com/)        | [The City of Los Angeles, CA](http://webanalytics.lacity.org/)                         |
+| [The City of New Orleans, LA](http://webanalytics.nola.gov/)              | [The City of Newark, NJ](http://newarknj.seamlessreports.com/)                         |
+| [The Borough of Norristown, PA](http://norristownpa.seamlessreports.com/) | [The City of Omaha, NE](https://analytics.cityofomaha.org/)                            |
+| [The City of Philadelphia, PA](http://analytics.phila.gov/)               | [The City of Pleasanton, CA](http://cityofpleasantonca.seamlessreports.com/)           |
+| [The City of Princeton, NJ](http://princeton.seamlessreports.com/)        | [The City of Sacramento, CA](http://analytics.cityofsacramento.org/)                   |
+| [The City of San Francisco, CA](http://analytics.sfgov.org/)              | [The City of San Leandro, CA](http://sanleandroca.seamlessreports.com/)                |
+| [The City of Santa Monica, CA](http://analytics.smgov.net/)               | [Carbarrus County, NC](http://analytics.cabarruscounty.us/)                            |
 | [Cook County, IL](http://opendocs.cookcountyil.gov/analytics/)            | [data.jerseycitynj.gov](http://datajerseycitynj.seamlessreports.com/)                  |
-| [City of Seattle](https://www.seattle.gov/about-our-digital-properties/web-analytics)                 | [Douglas County, NE](http://analytics.douglascounty-ne.gov/)         
-| [Washington State University](https://analytics.wsu.edu/)                 | [State of Indiana](https://analytics.in.gov/)               
+| [data.seattle.gov](http://seattlewa.seamlessreports.com/)                 | [Douglas County, NE](http://analytics.douglascounty-ne.gov/)                           |
+| [Moulton Niguel Water District](http://mnwd.seamlessreports.com/)         | [NYSERDA](http://nyserda.seamlessreports.com/)                                         |
+| [Washington State University](https://analytics.wsu.edu/)                 | [Rowan County, NC](http://rowan.seamlessreports.com/)                                  |
 | [The States of Jersey](http://webanalytics.gov.je/)                       | [Tennessee Dept of  Environment and Conservation](http://analytics.tdec.tn.gov/) |
 | [U.S. Department of Education](http://www2.ed.gov/analytics)              | [U.S. Department of Veterans Affairs](http://www.oit.va.gov/analytics/)                |
-| [Government of Canada](https://gcanalyticsapp.com/gca-dashboard/dashboard-index) | [State of Georgia](https://analytics.georgia.gov/) 
-| [The City of Pittsburgh](http://webstats.pittsburghpa.gov/)              |  [State of Kansas](https://analytics.kansas.gov/)
 
 [This blog post details their implementations and lessons learned](https://18f.gsa.gov/2016/01/05/tips-for-adapting-analytics-usa-gov/).
-
-## About the components
-Ths app uses [Jekyll](https://jekyllrb.com) to build the site, and [Sass](https://sass-lang.com/), [Bourbon](http://bourbon.io), and [Neat](https://neat.bourbon.io) for CSS.
-
-The javascript provided is a [webpacked](https://webpack.js.org/) aggregation of [several different modules](#javascript-modules), leveraging [d3](https://d3js.org/) for the visualizations. [Learn more on the webpack configuration](#webpack-configuration)
-
-## Developing locally
-
-There are a couple of different ways to develop locally. Either using docker or running without docker.
 
 ### Setup using Docker
 
@@ -43,24 +37,24 @@ You need  [Docker](https://github.com/docker/docker) and  [docker-compose](https
 
 To build and run the app with docker-compose, run `docker-compose up -d` then you can access the app from `http://localhost:4000`, as the local filesystem is mounted on top of the docker container you can edit the files as you are developing locally.
 
-* this does not yet run the webpack script.
-
 To see the jekyll logs, run:
 
 ```bash
 docker-compose logs -f
 ```
 
-## Running locally without docker.
-Run Jekyll with development settings:
+### Setup using Ruby
+
+Ths app uses [Jekyll](http://jekyllrb.com) to build the site, and [Sass](http://sass-lang.com/), [Bourbon](http://bourbon.io), and [Neat](http://neat.bourbon.io) for CSS.
+
+Install them all:
 
 ```bash
-make dev
-npm install
-npm run build-dev
+bundle install
 ```
 
-(This runs `bundle exec jekyll serve --watch --config=_config.yml,_development.yml`.)
+[`analytics-reporter`](https://github.com/18F/analytics-reporter) is the code that powers the analytics dashboard.
+Please clone the `analytics-reporter` next to a local copy of this github repository.
 
 ### Adding Additional Agencies
 
@@ -88,6 +82,16 @@ npm run build-dev
 ```yaml
 {% include charts.html %}
 ```
+
+### Developing locally
+
+Run Jekyll with development settings:
+
+```bash
+make dev
+```
+
+(This runs `bundle exec jekyll serve --watch --config=_config.yml,_development.yml`.)
 
 ### Developing with local data
 
@@ -118,16 +122,6 @@ serve --cors
 
 The data will be available at `http://localhost:3000` over CORS, with no path prefix. For example, device data will be at `http://localhost:3000/devices.json`.
 
-### Javascript Modules
-* **Index** - includes the main dom selection and rendering queue of components, and the entry point for the webpack bundler.
-* **lib/barchart** the d3 configuration of the bar charts
-* **lib/blocks** an object of the specific components
-* **lib/consoleprint** the console messages displayed to users
-* **lib/exceptions** agency data to be changed by discrete exception rules
-* **lib/formatters** methods to help format the display of visualization scales and values
-* **lib/renderblock** d3 manipulator to load and render data for a component block
-* **lib/timeseries** the d3 configuration of the timeseries charts
-* **lib/transformers** helper methods to manipulate and consolidate raw data into proportional data.
 
 ### Deploying the app
 
@@ -187,25 +181,6 @@ docker push 18fgsa/analytics.usa.gov:<version>-production
 |-------------| ------ | --- |
 | Production | master | https://analytics.usa.gov |
 | Staging | master | https://analytics-staging.app.cloud.gov |
-
-### Webpack Configuration
-The application compiles es6 modules into web friendly js via Wepback and the [babel loader](https://webpack.js.org/loaders/babel-loader/).
-
-The webpack configuration is set in the [wepback.config.js](./webpack.config.js).
-
-The current configuration uses babel `present-env`.
-
-The webpack also includes linting using [eslint](https://eslint.org/) leveraging the [AirBnb linting preset](https://www.npmjs.com/package/eslint-config-airbnb).
-
-The webconfig uses the [UglifyJSPlugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin/) to minimize the bundle.
-
-The resulting uglified bundle is build into `assest/bundle.js`.
-
-#### NPM webpack commands
-| Command | purpose |
-|-------------| ------ |
-| npm run build-dev | a watch command rebuilding the webpack with a development configuration (i.e. no minifiecation) |
-| npm run build-prod | a webpack command to build a minified and transpiled bundle.js |
 
 ### Public domain
 
