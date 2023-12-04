@@ -94,6 +94,10 @@
         ga('send','event','Top-Download File', link, text);
       });
 
+      document.querySelectorAll("[data-source]").forEach((source) => {
+    source.dataset.source = source.dataset.source.split("?")[0] + "?ignoreCache=" + Math.floor(Math.random()*50)
+})
+
     });
   </script>
 

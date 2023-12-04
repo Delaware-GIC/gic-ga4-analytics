@@ -12,11 +12,11 @@ import transformers from './transformers';
  */
 export default {
 
-  // the realtime block is just `data.totals.active_visitors` formatted with commas
+  // the realtime block is just `data.totals.activeUsers` formatted with commas
   realtime: renderBlock.loadAndRender()
     .render((selection, data) => {
-      const totals = data.data[0];
-      selection.text(formatters.addCommas(+totals.active_visitors));
+      const totals = data.totals;
+      selection.text(formatters.addCommas(+totals.activeUsers));
     }),
 
   today: renderBlock.loadAndRender()
@@ -52,11 +52,12 @@ export default {
   os: renderBlock.buildBarBasicChart('os'),
 
   // the windows block is a stack layout
-  windows: renderBlock.buildBarBasicChart('os_version'),
+  windows: renderBlock.buildBarBasicChart('windows'),
 
   // the devices block is a stack layout
   devices: renderBlock.loadAndRender()
     .transform((d) => {
+      console.log(d)
       const devices = transformers.listify(d.totals.devices);
       return transformers.findProportionsOfMetricFromValue(devices);
     })
@@ -87,7 +88,7 @@ export default {
     const cityListFiltered = cityList.filter(c => (c.city !== '(not set)') && (c.city !== 'zz'));
     const proportions = transformers.findProportionsOfMetric(
       cityListFiltered,
-      list => list.map(x => x.active_visitors),
+      list => list.map(x => x.activeUsers),
     );
     return proportions.slice(0, 10);
   }, 'city'),
@@ -96,9 +97,9 @@ export default {
     let totalVisits = 0;
     let USVisits = 0;
     d.data.forEach((c) => {
-      totalVisits += parseInt(c.active_visitors, 10);
+      totalVisits += parseInt(c.activeUsers, 10);
       if (c.country === 'United States') {
-        USVisits = c.active_visitors;
+        USVisits = c.activeUsers;
       }
     });
     const international = totalVisits - USVisits;
@@ -112,7 +113,7 @@ export default {
   international_visits: renderBlock.buildBarChartWithLabel((d) => {
     let values = transformers.findProportionsOfMetric(
       d.data,
-      list => list.map(x => x.active_visitors),
+      list => list.map(x => x.activeUsers),
     );
     values = values.filter(c => c.country !== 'United States');
     return values.slice(0, 15);
@@ -177,7 +178,7 @@ export default {
     })
     .render(barChart()
       .label(d => d.page_title)
-      .value(d => +d.active_visitors)
+      .value(d => +d.activeUsers)
       .scale(values => d3.scale.linear()
         .domain([0, 1, d3.max(values)])
         .rangeRound([0, 1, 100]))
