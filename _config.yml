@@ -56,7 +56,7 @@ url: https://analytics.delaware.gov
 dropdown_title: Select an Agency...
 
 # Default data url (also needs to be in nginx.conf for cloud.gov deployment)
-data_url: https://analytics.delaware.gov/data
+data_url: https://storage.googleapis.com/degic/test
 
 # twitter information
 twitter: 

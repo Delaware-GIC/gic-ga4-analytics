@@ -95,14 +95,15 @@
     // the realtime block is just `data.totals.pageviews` formatted with commas
     "realtime": renderBlock()
       .render(function(selection, data) {
-        var totals = data.data[0];
-        if (typeof(totals) === 'undefined') {totals={}; totals.pageviews="0";} // Mike Edit
-        selection.text(formatCommas(+totals.pageviews));
+        var totals = data.totals;
+        if (typeof(totals) === 'undefined') {totals={}; totals.sessions="0";} // Mike Edit
+        selection.text(formatCommas(+totals.sessions));
       }),
 
     "today": renderBlock()
       .transform(function(data) {
-        return data;
+       
+        return data
       })
       .render(function(svg, data) {
         var days = data.data;
@@ -112,7 +113,7 @@
 
         var y = function(d) { return d.visits; },
             series = timeSeries()
-              .series([data.data])
+              .series([data.data.sort((a, b) => +a.hour - +b.hour)])
               .y(y)
               .label(function(d) {
                 return formatHour(d.hour);
@@ -149,7 +150,8 @@
     // the windows block is a stack layout
     "windows": renderBlock()
       .transform(function(d) {
-        var values = listify(d.totals.os_version),
+     
+        var values = listify(d.totals.windows),
             total = d3.sum(values.map(function(d) { return d.value; }));
         return addShares(collapseOther(values, total * .001)); // % of Windows
       })
@@ -180,7 +182,7 @@
     // the browsers block is a table
     "browsers": renderBlock()
       .transform(function(d) {
-        var values = listify(d.totals.browser),
+        var values = listify(d.totals.browsers),
             total = d3.sum(values.map(function(d) { return d.value; }));
         return addShares(collapseOther(values, total * .01));
       })
@@ -209,7 +211,7 @@
         var city_list_filtered = city_list.filter(function (c) {
           return (c.city != "(not set)") && (c.city != "zz");
         });
-        city_list_filtered = addShares(city_list_filtered, function(d){return d.active_visitors;});
+        city_list_filtered = addShares(city_list_filtered, function(d){return d.activeUsers;});
         return city_list_filtered.slice(0, 10);
       })
       .render(
@@ -224,9 +226,9 @@
         var total_visits = 0;
         var us_visits = 0;
         d.data.forEach(function(c) {
-          total_visits += parseInt(c.active_visitors);
+          total_visits += parseInt(c.activeUsers);
           if (c.country === "United States") {
-            us_visits = c.active_visitors;
+            us_visits = c.activeUsers;
           }
         });
         var international = total_visits - us_visits;
@@ -243,7 +245,7 @@
       ),
     "international_visits": renderBlock()
       .transform(function(d) {
-        var countries = addShares(d.data, function(d){ return d.active_visitors; });
+        var countries = addShares(d.data, function(d){ return d.activeUsers; });
         countries = countries.filter(function(c) {
           return c.country != "United States";
         });
@@ -284,7 +286,8 @@
     // the top pages block(s)
     "top-pages": renderBlock()
       .transform(function(d) {
-        return d.data;
+        
+        return d.data.filter(d => d.pageTitle !== "(not set)" && d.pageTitle !== "");
       })
       .on("render", function(selection, data) {
         // turn the labels into links
@@ -296,15 +299,15 @@
           .append("a")
             .attr("target", "_blank")
             .attr("href", function(d) {
-              return exceptions[d.domain] || ("http://" + d.page);
+              return exceptions[d.domain] || (d.pageLocation);
             })
             .text(function(d) {
-              return title_exceptions[d.domain] || d.page_title;
+              return title_exceptions[d.domain] || d.pageTitle;
             });
       })
       .render(barChart()
-        .label(function(d) { return d.page_title; })
-        .value(function(d) { return +d.pageviews; })
+        .label(function(d) { return d.pageTitle; })
+        .value(function(d) { return +d.sessions; })
         .scale(function(values) {
           var max = d3.max(values);
           return d3.scale.linear()
@@ -339,7 +342,7 @@
       })
       .render(barChart()
         .label(function(d) { return d.page_title; })
-        .value(function(d) { return +d.active_visitors; })
+        .value(function(d) { return +d.activeUsers; })
         .scale(function(values) {
           var max = d3.max(values);
           return d3.scale.linear()
@@ -530,10 +533,13 @@
 
     function onerror(selection, request) {
       var message = request.responseText;
+      console.log(selection)
+      selection.text("No data to display.")
+
 
       selection.classed("error", true)
         .select(".error-message")
-          .text(message);
+          .text("Error!");
 
       dispatch.error(selection, request, message);
     }
@@ -628,6 +634,7 @@
             return size(value(d));
           });
 
+      
       bin.select(".label").html(label);
       bin.select(".value").text(function(d, i) {
         return format.call(this, value(d), d, i);
