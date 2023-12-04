@@ -50,7 +50,7 @@ title: "analytics.delaware.gov | The State of Delaware's web traffic."
 description: "Official data on web traffic to dozens of Delaware government websites."
 
 # Site's own URL
-url: https://analytics.delaware.gov
+url: https://staging.analytics-delaware.pages.dev/
 
 # Default dropdown title, will not appear if there are no sub-pages
 dropdown_title: Select an Agency...
