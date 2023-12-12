@@ -28,7 +28,7 @@
     "forecast.weather.gov/mapclick.php": "National Weather Service - Forecasts by Region",
   };
 
-
+  
   // common parsing and formatting functions
   var formatCommas = d3.format(","),
       parseDate = d3.time.format("%Y-%m-%d").parse,
@@ -85,6 +85,10 @@
         var domain = split_urls[split_urls.length-1];
         return domain.replace(new RegExp("%20", "g"), " ");
       },
+      sum = (arr, sumVal) => arr.map(sumVal ? sumVal : (d) => d).filter(Boolean).reduce((acc, curr) => +acc + +curr, 0),
+      functor = function(v) {
+        return typeof v === "function" ? v : function() { return v; };
+      },
       TRANSITION_DURATION = 500;
 
   /*
@@ -97,7 +101,8 @@
       .render(function(selection, data) {
         var totals = data.totals;
         if (typeof(totals) === 'undefined') {totals={}; totals.sessions="0";} // Mike Edit
-        selection.text(formatCommas(+totals.sessions));
+        
+        document.querySelector("#current_visitors").innerText = formatCommas(+totals.sessions);
       }),
 
     "today": renderBlock()
@@ -140,7 +145,7 @@
     "os": renderBlock()
       .transform(function(d) {
         var values = listify(d.totals.os),
-            total = d3.sum(values.map(function(d) { return d.value; }));
+            total = sum(values.map(function(d) { return d.value; }));
         return addShares(collapseOther(values, total * .01));
       })
       .render(barChart()
@@ -152,7 +157,7 @@
       .transform(function(d) {
      
         var values = listify(d.totals.windows),
-            total = d3.sum(values.map(function(d) { return d.value; }));
+            total = sum(values.map(function(d) { return d.value; }));
         return addShares(collapseOther(values, total * .001)); // % of Windows
       })
       .render(barChart()
@@ -174,16 +179,16 @@
          * users.json, we total up the device numbers to get the "big
          * number", saving us an extra XHR load.
          */
-        var total = d3.sum(data.map(function(d) { return d.value; }));
-        d3.select("#total_visitors")
-          .text(formatBigNumber(total));
+        
+        let total = data.reduce((acc, curr) => acc + curr.value, 0);        
+        document.querySelector("#total_visitors").innerText = formatBigNumber(total);
       }),
 
     // the browsers block is a table
     "browsers": renderBlock()
       .transform(function(d) {
         var values = listify(d.totals.browsers),
-            total = d3.sum(values.map(function(d) { return d.value; }));
+            total = sum(values.map(function(d) { return d.value; }));
         return addShares(collapseOther(values, total * .01));
       })
       .render(barChart()
@@ -195,7 +200,7 @@
     "ie": renderBlock()
       .transform(function(d) {
         var values = listify(d.totals.ie_version),
-            total = d3.sum(values.map(function(d) { return d.value; }));
+            total = sum(values.map(function(d) { return d.value; }));
         return addShares(collapseOther(values, total * .0001)); // % of IE
       })
       .render(
@@ -363,23 +368,25 @@
    * 2. looking up the block id in our `BLOCKS` object, and
    * 3. if a renderer exists, calling it on the selection
    */
-  d3.selectAll("*[data-source]")
-    .each(function() {
-      var blockId = this.getAttribute("data-block"),
+  document.querySelectorAll("*[data-source]")
+    .forEach(function(d) {
+     
+      let blockId = d.getAttribute("data-block"),
           block = BLOCKS[blockId];
       if (!block) {
         return console.warn("no block registered for: %s", blockId);
       }
 
       // each block's promise is resolved when the block renders
-      PROMISES[blockId] = Q.Promise(function(resolve, reject) {
+
+      PROMISES[blockId] = new Promise(function(resolve, reject) {
         block.on("render.promise", resolve);
         block.on("error.promise", reject);
       });
 
-      d3.select(this)
+      d3.select(d)
         .datum({
-          source: this.getAttribute("data-source"),
+          source: d.getAttribute("data-source"),
           block: blockId
         })
         .call(block);
@@ -394,12 +401,12 @@
   });
 
   // nest the IE chart inside the browsers chart once they're both rendered
-  whenRendered(["browsers", "ie"], function() {
-    d3.select("#chart_browsers")
-      .call(nestCharts, function(d) {
-        return d.key === "Internet Explorer";
-      }, d3.select("#chart_ie"));
-  });
+  // whenRendered(["browsers", "ie"], function() {
+  //   d3.select("#chart_browsers")
+  //     .call(nestCharts, function(d) {
+  //       return d.key === "Internet Explorer";
+  //     }, d3.select("#chart_ie"));
+  // });
 
   // nest the international countries chart inside the "International" chart once they're both rendered
   whenRendered(["countries", "international_visits"], function() {
@@ -493,6 +500,7 @@
         dispatch = d3.dispatch("loading", "load", "error", "render");
 
     var block = function(selection) {
+      console.log(selection)
       selection
         .each(load)
         .filter(function(d) {
@@ -552,13 +560,13 @@
 
     block.url = function(x) {
       if (!arguments.length) return url;
-      url = d3.functor(x);
+      url = functor(x);
       return block;
     };
 
     block.transform = function(x) {
       if (!arguments.length) return transform;
-      transform = d3.functor(x);
+      transform = functor(x);
       return block;
     };
 
@@ -582,11 +590,13 @@
    * listify an Object into its key/value pairs (entries) and sorting by
    * numeric value descending.
    */
+
+  const sortDescending = (a, b) => b-a
+
   function listify(obj) {
-    return d3.entries(obj)
-      .sort(function(a, b) {
-        return d3.descending(+a.value, +b.value);
-      });
+    return Object.entries(obj)
+    .map((obj) => ({ key: obj[0], value: obj[1] }))
+    .sort((a, b) => sortDescending(+a.value, +b.value))
   }
 
   function barChart() {
@@ -643,31 +653,31 @@
 
     chart.bars = function(x) {
       if (!arguments.length) return bars;
-      bars = d3.functor(x);
+      bars = functor(x);
       return chart;
     };
 
     chart.label = function(x) {
       if (!arguments.length) return label;
-      label = d3.functor(x);
+      label = functor(x);
       return chart;
     };
 
     chart.value = function(x) {
       if (!arguments.length) return value;
-      value = d3.functor(x);
+      value = functor(x);
       return chart;
     };
 
     chart.format = function(x) {
       if (!arguments.length) return format;
-      format = d3.functor(x);
+      format = functor(x);
       return chart;
     };
 
     chart.scale = function(x) {
       if (!arguments.length) return scale;
-      scale = d3.functor(x);
+      scale = functor(x);
       return chart;
     };
 
@@ -788,25 +798,25 @@
 
     timeSeries.series = function(fs) {
       if (!arguments.length) return series;
-      series = d3.functor(fs);
+      series = functor(fs);
       return timeSeries;
     };
 
     timeSeries.bars = function(fb) {
       if (!arguments.length) return bars;
-      bars = d3.functor(fb);
+      bars = functor(fb);
       return timeSeries;
     };
 
     timeSeries.x = function(fx) {
       if (!arguments.length) return x;
-      x = d3.functor(fx);
+      x = functor(fx);
       return timeSeries;
     };
 
     timeSeries.y = function(fy) {
       if (!arguments.length) return y;
-      y = d3.functor(fy);
+      y = functor(fy);
       return timeSeries;
     };
 
@@ -856,7 +866,8 @@
 
   function addShares(list, value) {
     if (!value) value = function(d) { return d.value; };
-    var total = d3.sum(list.map(value));
+    var total = sum(list, value);
+    
     list.forEach(function(d) {
       d.share = value(d) / total;
     });
@@ -890,7 +901,7 @@
     var promises = blockIds.map(function(id) {
       return PROMISES[id];
     });
-    return Q.all(promises).then(callback);
+    return Promise.all(promises).then(callback);
   }
 
   /*
@@ -951,11 +962,11 @@
       medium_bold: "font-size: 10pt; font-weight: bold",
       medium_link: "font-size: 10pt; font-weight: bold; color: #18f",
     };
-    console.log("%cHi! Please poke around to your heart's content.", styles.big);
-    console.log(" ");
-    console.log("%cIf you find a bug or something, please report it over at %chttps://github.com/GSA/analytics.usa.gov/issues", styles.medium, styles.medium_link);
-    console.log("%cLike it, but want a different front-end? The data reporting is its own tool: %chttps://github.com/18f/analytics-reporter", styles.medium, styles.medium_link);
-    console.log("%cThis is an open source, public domain project, and your contributions are very welcome.", styles.medium);
+    // console.log("%cHi! Please poke around to your heart's content.", styles.big);
+    // console.log(" ");
+    // console.log("%cIf you find a bug or something, please report it over at %chttps://github.com/GSA/analytics.usa.gov/issues", styles.medium, styles.medium_link);
+    // console.log("%cLike it, but want a different front-end? The data reporting is its own tool: %chttps://github.com/18f/analytics-reporter", styles.medium, styles.medium_link);
+    // console.log("%cThis is an open source, public domain project, and your contributions are very welcome.", styles.medium);
 
   }
 
@@ -963,8 +974,9 @@
 var dropDown = document.getElementById('agency-selector');
 
 // Start on change listener to load new page
-d3.select(dropDown).on("change", function () {
-  window.location= d3.select(this).property('value');
+
+dropDown.addEventListener("change", function () {
+  window.location = this.value; 
 });
 
 for (var j = 0; j < dropDown.options.length; j++) {
