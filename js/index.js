@@ -89,36 +89,57 @@
       functor = function(v) {
         return typeof v === "function" ? v : function() { return v; };
       },
-      TRANSITION_DURATION = 500;
+      TRANSITION_DURATION = 500,
+      EXCLUSIONS_LIST = ["(not set)", "zz", "(other)", ""];  // items to filter out of the data
 
+
+
+
+      const makeTotal = (data, totalKey, groupKey) => {
+
+        const uniqueKeys = [...new Set(data.map(d => d[groupKey]))]; 
+
+        return uniqueKeys.map((key) => ({
+              key: key, 
+              value: data.reduce((acc, curr) => curr[groupKey] === key ? acc + +curr[totalKey] : acc, 0),
+              pct: data.reduce((acc, curr) => curr[groupKey] === key ? acc + +curr[totalKey] : acc, 0) / data.reduce((acc, curr) => acc + +curr[totalKey], 0)
+            })).sort((a, b) => b.value - a.value);
+        }
   /*
    * Define block renderers for each of the different data types.
    */
   var BLOCKS = {
 
     // the realtime block is just `data.totals.pageviews` formatted with commas
-    "realtime": renderBlock()
+    "visitors-today": renderBlock()
       .render(function(selection, data) {
-        var totals = data.totals;
+        var totals = data.data[0];
         if (typeof(totals) === 'undefined') {totals={}; totals.sessions="0";} // Mike Edit
         
         document.querySelector("#current_visitors").innerText = formatCommas(+totals.sessions);
       }),
 
-    "today": renderBlock()
+    "visitors-hourly": renderBlock()
       .transform(function(data) {
-       
-        return data
+
+        let hours = Array.from({length: 24}, (v, k) => k);
+        let filledHourlyData = hours.map((hour) => data.data.findIndex((y) => +y.hour === hour) > -1 
+        ? data.data[data.data.findIndex((y) => +y.hour === hour)]
+        : ({date: data.data[0].date, hour: hour, sessions: 0}))
+        
+        return filledHourlyData
       })
       .render(function(svg, data) {
-        var days = data.data;
+        let days = data;
+       
         days.forEach(function(d) {
-          d.visits = +d.visits;
+          d.sessions = +d.sessions;
         });
 
-        var y = function(d) { return d.visits; },
-            series = timeSeries()
-              .series([data.data.sort((a, b) => +a.hour - +b.hour)])
+        let y = function(d) { return d.sessions; }; 
+
+        let series = timeSeries()
+              .series([data.sort((a, b) => +a.hour - +b.hour)])
               .y(y)
               .label(function(d) {
                 return formatHour(d.hour);
@@ -144,8 +165,8 @@
     // the OS block is a stack layout
     "os": renderBlock()
       .transform(function(d) {
-        var values = listify(d.totals.os),
-            total = sum(values.map(function(d) { return d.value; }));
+        let values = makeTotal(d.data, "sessions", "operatingSystem"); 
+        let total = d3.sum(values.map(function(d) { return d.value; }));
         return addShares(collapseOther(values, total * .01));
       })
       .render(barChart()
@@ -155,9 +176,8 @@
     // the windows block is a stack layout
     "windows": renderBlock()
       .transform(function(d) {
-     
-        var values = listify(d.totals.windows),
-            total = sum(values.map(function(d) { return d.value; }));
+        let values = makeTotal(d.data, "sessions", "operatingSystemVersion"); 
+        let total = sum(values.map(function(d) { return d.value; }));
         return addShares(collapseOther(values, total * .001)); // % of Windows
       })
       .render(barChart()
@@ -167,11 +187,15 @@
     // the devices block is a stack layout
     "devices": renderBlock()
       .transform(function(d) {
-        var devices = listify(d.totals.devices);
-        return addShares(devices);
+        // console.log("transformed:")
+        return makeTotal(d.data, "sessions", "deviceCategory")
+        // var devices = listify(d.totals.devices);
+        // return addShares(devices);
       })
       .render(barChart()
-        .value(function(d) { return d.share * 100; })
+        .label(function(d) { return d.key; })
+        .value(function(d) { 
+          return d.pct * 100; })
         .format(formatPercent))
       .on("render", function(selection, data) {
         /*
@@ -179,27 +203,33 @@
          * users.json, we total up the device numbers to get the "big
          * number", saving us an extra XHR load.
          */
-        
-        let total = data.reduce((acc, curr) => acc + curr.value, 0);        
+        console.log("DEVICES HAS RENDERED!!! ")
+        console.log(data)
+        let total = data.reduce((acc, curr) => acc + curr.value, 0);    
         document.querySelector("#total_visitors").innerText = formatBigNumber(total);
       }),
 
     // the browsers block is a table
     "browsers": renderBlock()
       .transform(function(d) {
-        var values = listify(d.totals.browsers),
-            total = sum(values.map(function(d) { return d.value; }));
+        // return makeTotal(d.data, "sessions", "browser")
+        let values = makeTotal(d.data, "sessions", "browser"); 
+        // console.log(totals.reduce((acc, curr) => acc + curr.value, 0))
+        // var values = listify(d.totals.browsers),
+          total = d3.sum(values.map(function(d) { return d.value; }));
         return addShares(collapseOther(values, total * .01));
+        // return collapseOther(, total * .01);
       })
       .render(barChart()
-        .value(function(d) { return d.share * 100; })
+        .label(function(d) { return d.key; })
+        .value(function(d) { return d.pct * 100; })
         .format(formatPercent)),
 
     // the IE block is a stack, but with some extra work done to transform the
     // data beforehand to match the expected object format
     "ie": renderBlock()
       .transform(function(d) {
-        var values = listify(d.totals.ie_version),
+        let values = listify(d.totals.ie_version),
             total = sum(values.map(function(d) { return d.value; }));
         return addShares(collapseOther(values, total * .0001)); // % of IE
       })
@@ -212,14 +242,34 @@
     "cities": renderBlock()
       .transform(function(d) {
         // remove "(not set) from the data"
-        var city_list = d.data;
-        var city_list_filtered = city_list.filter(function (c) {
-          return (c.city != "(not set)") && (c.city != "zz");
-        });
-        city_list_filtered = addShares(city_list_filtered, function(d){return d.activeUsers;});
-        return city_list_filtered.slice(0, 10);
-      })
-      .render(
+        
+        let sharesAdded = addShares(d.data, (d) => d.activeUsers);
+
+        let filteredOtheredData = sharesAdded.reduce((acc, curr) => {
+            if(acc.length < 9 && !EXCLUSIONS_LIST.includes(curr.city)) {
+              acc.push(curr); 
+            } else {
+                let otherIndex = acc.findIndex((d) => d.city === "Other"); 
+                  if(otherIndex > -1) { 
+                      let other = acc[otherIndex]; 
+                      acc[otherIndex] = {city: "Other", activeUsers: curr.activeUsers + other.activeUsers, share: curr.share + other.share}
+                  } else {
+                      acc.push({city: "Other", activeUsers: curr.activeUsers, share: curr.share})
+                  }
+            }
+          
+              return acc 
+          }, [])
+
+        // Move "Other" to the end of the list
+
+        let otherIndex = filteredOtheredData.findIndex((d) => d.city === "Other");
+        let other = filteredOtheredData[otherIndex];
+        filteredOtheredData.splice(otherIndex, 1);
+        filteredOtheredData.push(other);
+
+        return filteredOtheredData
+      }).render(
         barChart()
           .value(function(d) { return d.share * 100; })
           .label(function(d) { return d.city; })
@@ -290,9 +340,8 @@
 
     // the top pages block(s)
     "top-pages": renderBlock()
-      .transform(function(d) {
-        
-        return d.data.filter(d => d.pageTitle !== "(not set)" && d.pageTitle !== "");
+      .transform(function(d) {        
+        return d.data.filter(d => !EXCLUSIONS_LIST.includes(d.pageTitle)).slice(0,20);
       })
       .on("render", function(selection, data) {
         // turn the labels into links
@@ -304,15 +353,15 @@
           .append("a")
             .attr("target", "_blank")
             .attr("href", function(d) {
-              return exceptions[d.domain] || (d.pageLocation);
+              return `https://${d.fullPageUrl}`
             })
             .text(function(d) {
-              return title_exceptions[d.domain] || d.pageTitle;
+              return d.pageTitle;
             });
       })
       .render(barChart()
         .label(function(d) { return d.pageTitle; })
-        .value(function(d) { return +d.sessions; })
+        .value(function(d) { return +d.totalUsers; })
         .scale(function(values) {
           var max = d3.max(values);
           return d3.scale.linear()
@@ -338,16 +387,20 @@
             .attr("title", function(d) {
               return d.page_title;
             })
+            // .attr("href", function(d) {
+            //   return exceptions[d.page] || ("http://" + d.page);
+            // })
+            // Nile note – GA4 realtime API does not return the page path/URL so we can't link to it
             .attr("href", function(d) {
-              return exceptions[d.page] || ("http://" + d.page);
+              return "#";
             })
             .text(function(d) {
               return title_exceptions[d.page] || d.page_title;
             });
       })
       .render(barChart()
-        .label(function(d) { return d.page_title; })
-        .value(function(d) { return +d.activeUsers; })
+        .label(function(d) { return d.pageTitle; })
+        .value(function(d) { return +d.totalUsers; })
         .scale(function(values) {
           var max = d3.max(values);
           return d3.scale.linear()
@@ -368,7 +421,7 @@
    * 2. looking up the block id in our `BLOCKS` object, and
    * 3. if a renderer exists, calling it on the selection
    */
-  document.querySelectorAll("*[data-source]")
+  document.querySelectorAll("*[data-block]")
     .forEach(function(d) {
      
       let blockId = d.getAttribute("data-block"),
@@ -400,13 +453,6 @@
       }, d3.select("#chart_windows"));
   });
 
-  // nest the IE chart inside the browsers chart once they're both rendered
-  // whenRendered(["browsers", "ie"], function() {
-  //   d3.select("#chart_browsers")
-  //     .call(nestCharts, function(d) {
-  //       return d.key === "Internet Explorer";
-  //     }, d3.select("#chart_ie"));
-  // });
 
   // nest the international countries chart inside the "International" chart once they're both rendered
   whenRendered(["countries", "international_visits"], function() {
@@ -500,7 +546,6 @@
         dispatch = d3.dispatch("loading", "load", "error", "render");
 
     var block = function(selection) {
-      console.log(selection)
       selection
         .each(load)
         .filter(function(d) {
@@ -541,7 +586,6 @@
 
     function onerror(selection, request) {
       var message = request.responseText;
-      console.log(selection)
       selection.text("No data to display.")
 
 
@@ -866,6 +910,7 @@
 
   function addShares(list, value) {
     if (!value) value = function(d) { return d.value; };
+    
     var total = sum(list, value);
     
     list.forEach(function(d) {
@@ -975,8 +1020,8 @@ var dropDown = document.getElementById('agency-selector');
 
 // Start on change listener to load new page
 
-dropDown.addEventListener("change", function () {
-  window.location = this.value; 
+dropDown.addEventListener("change", function (e) {
+  window.location = e.target.value; 
 });
 
 for (var j = 0; j < dropDown.options.length; j++) {

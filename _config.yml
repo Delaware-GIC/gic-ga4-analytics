@@ -57,6 +57,7 @@ dropdown_title: Select an Agency...
 
 # Default data url (also needs to be in nginx.conf for cloud.gov deployment)
 data_url: https://storage.googleapis.com/degic/test
+# data_url: http://localhost:3000
 
 # twitter information
 twitter: 

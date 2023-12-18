@@ -25,9 +25,9 @@
       </section>
       -->
       <div id="main_data" class="width-two-thirds">
-        <section id="realtime"
-          data-block="realtime"
-          data-source="{{ site.data_url }}/{{ data_prefix }}/visitors-today.json?ignoreCache=15"
+        <section id="visitors-today"
+          data-block="visitors-today"
+          data-source="{{ site.data_url }}/{{ data_prefix }}/visitors-today.json"
           data-refresh="15">
           <h2 id="current_visitors" class="data">...</h2>
           <div class="chart_subtitle">people have visited {{ the }}{{ entity }} website{{ plural }} today</div>
@@ -38,8 +38,8 @@
           <h4>Eastern Time</h4>
         </section>
         <section id="time_series"
-          data-block="today"
-          data-source="{{ site.data_url }}/{{ data_prefix }}/visitors-hourly.json?ignoreCache=true"
+          data-block="visitors-hourly"
+          data-source="{{ site.data_url }}/{{ data_prefix }}/visitors-hourly.json"
           data-refresh="15">
           <svg class="data time-series">
           </svg>
@@ -99,7 +99,7 @@
 
           <figure id="chart_windows"
             data-block="windows"
-            data-source="{{ site.data_url }}/{{ data_prefix }}/windows.json?ignoreCache=1"
+            data-source="{{ site.data_url }}/{{ data_prefix }}/windows.json"
             data-scale-to-parent="true">
             <h4>Windows</h4>
             <div class="data bar-chart">
