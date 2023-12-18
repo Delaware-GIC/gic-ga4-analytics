@@ -5,7 +5,6 @@ In `js/vendor/`:
 * [`aight.js`](https://github.com/shawnbot/aight/blob/73a5bce48e0c4a15deca17767278c437afa548b0/LICENSE)
 * [`d3.js`](https://github.com/mbostock/d3/blob/4e4709ce47d5c9406290dc2a467cef08002fc9b7/LICENSEhttps://github.com/mbostock/d3/blob/master/LICENSE)
 * [`moment.js`](https://github.com/moment/moment/blob/78a53b8cb53e967c6dac2e7325e18da2a472fc2d/LICENSE)
-* [`q.js`](https://github.com/kriskowal/q/blob/3159ac47c46cb7e2200191736ca430a011615523/LICENSE)
 
 In `sass/`:
 

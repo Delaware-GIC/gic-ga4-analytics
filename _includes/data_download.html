@@ -17,8 +17,10 @@
             <select name="agency-selector" id="agency-selector"  title="Agency Selection Dropdown">
               <option value="{{ site.baseurl }}/data/">{{ site.dropdown_title }}</option>
               {% for agency in agencies %}
+                {% if agency.include == true %}
                 <option value="{{ site.baseurl }}{{ agency.url }}data/">{{ agency.name_dropdown }}</option>
-              {% endfor %}
+                {% endif %}
+                {% endfor %}
             </select>
           </form>
         </div>
@@ -43,32 +45,32 @@
               <td><a href="{{ site.data_url }}/{{ data_prefix }}/top-downloads-yesterday.csv" class="download-data"><span class="usa-label-big">CSV</span></a></td>
               <td>Daily</td>
             </tr>-->
-            <tr>
+            <tr data-block="top-traffic-sources-30-days">
               <td>Top traffic sources (30 days)</td>
               <td>
-                    <a href="{{ site.data_url }}/{{ data_prefix }}/top-traffic-sources-30-days.csv" class="download-data"><span class="usa-label-big">CSV</span></a>
+                    <a href="" class=" csvLink download-data"><span class="usa-label-big">CSV</span></a>
                     <a href="{{ site.data_url }}/{{ data_prefix }}/top-traffic-sources-30-days.json" class="download-data"><span class="usa-label-big">JSON</span></a>
               </td>
               <td>Daily</td>
             </tr>
-            <tr>
+            <!-- <tr>
               <td>Top exit pages (30 days)</td>
               <td>
                     <a href="{{ site.data_url }}/{{ data_prefix }}/top-exit-pages-30-days.csv" class="download-data"><span class="usa-label-big">CSV</span></a>
                     <a href="{{ site.data_url }}/{{ data_prefix }}/top-exit-pages-30-days.json" class="download-data"><span class="usa-label-big">JSON</span></a>
               </td>
               <td>Daily</td>
-            </tr>
-            <tr>
+            </tr> -->
+            <!-- <tr>
               <td>All pages people are visiting</td>
               <td><a href="{{ site.data_url }}/{{ data_prefix }}/all-pages-realtime.csv" class="download-data"><span class="usa-label-big">CSV</span></a></td>
               <td>Every 5 minutes</td>
-            </tr>
-            <tr>
+            </tr> -->
+            <!-- <tr>
               <td>Total people online</td>
               <td><a href="{{ site.data_url }}/{{ data_prefix }}/realtime.json" class="download-data"><span class="usa-label-big">JSON</span></a></td>
               <td>Every 5 minutes</td>
-            </tr>
+            </tr> -->
           </tbody>
         </table>
         <h2>Visitor demographics for {% if page.article | size != "0" %}{{ page.article }} {% endif %}{% if entity == 'government' %}all participating agencies{% else %}{{ entity }}{% endif %}</h2>
@@ -81,98 +83,100 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr data-block="language">
               <td>Language</td>
               <td>
-                    <a href="{{ site.data_url }}/{{ data_prefix }}/language.csv" class="download-data"><span class="usa-label-big">CSV</span></a>
-                    <a href="{{ site.data_url }}/{{ data_prefix }}/language.json" class="download-data"><span class="usa-label-big">JSON</span></a>
+                <a href="" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
+                <a href="{{ site.data_url }}/{{ data_prefix }}/language.json" class="download-data"><span class="usa-label-big">JSON</span></a>
               </td>
               <td>Daily</td>
             </tr>
-            <tr>
+            <tr data-block="top-countries-realtime">
               <td>Visitors per country</td>
               <td><a href="{{ site.data_url }}/{{ data_prefix }}/top-countries-realtime.json" class="download-data"><span class="usa-label-big">JSON</span></a></td>
               <td>Every 5 minutes</td>
             </tr>
-            <tr>
+            <tr data-block="top-cities-realtime">
               <td>Visitors per city</td>
               <td><a href="{{ site.data_url }}/{{ data_prefix }}/top-cities-realtime.json" class="download-data"><span class="usa-label-big">JSON</span></a></td>
               <td>Every 5 minutes</td>
             </tr>
 
-            <tr>
-                <td>Desktop/mobile/tablet</td>
-                <td><a href="{{ site.data_url }}/{{ data_prefix }}/devices.csv" class="download-data"><span class="usa-label-big">CSV</span></a></td>
+            <tr data-block="devices">
+              <td>Desktop/mobile/tablet</td>
+                <td>
+                  <a href="" class="csvLink download-data"><span class="usa-label-big">CSV</span></a></td>
                 <td>Daily</td>
               </tr>
-              <tr class="parent">
+              <tr data-block="browsers" class="parent">
                 <td>Web browsers</td>
                 <td>
-                  <a href="{{ site.data_url }}/{{ data_prefix }}/browsers.csv" class="download-data"><span class="usa-label-big">CSV</span></a>
+                  <!-- <a class="csvLink" href="{{ site.data_url }}/{{ data_prefix }}/browsers.csv" class="download-data"><span class="usa-label-big">CSV</span></a> -->
+                  <a href="" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/browsers.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
               </tr>
-              <tr class="subset">
+              <!-- <tr class="subset">
                 <td>Versions of Internet Explorer</td>
                 <td>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/ie.csv" class="download-data"><span class="usa-label-big">CSV</span></a>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/ie.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
-              </tr>
-              <tr class="parent">
+              </tr> -->
+              <tr data-block="os" class="parent">
                 <td>Operating systems</td>
                 <td>
-                  <a href="{{ site.data_url }}/{{ data_prefix }}/os.csv" class="download-data"><span class="usa-label-big">CSV</span></a>
+                  <a href="" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/os.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
               </tr>
-              <tr class="subset">
+              <tr data-block="windows" class="subset">
                 <td>Versions of Windows</td>
                 <td>
-                  <a href="{{ site.data_url }}/{{ data_prefix }}/windows.csv" class="download-data"><span class="usa-label-big">CSV</span></a>
+                  <a href="" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/windows.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
               </tr>
-              <tr>
+              <tr data-block="os-browsers">
                 <td>OS &amp; browser (combined)</td>
                 <td>
-                  <a href="{{ site.data_url }}/{{ data_prefix }}/os-browsers.csv" class="download-data"><span class="usa-label-big">CSV</span></a>
+                  <a href="" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/os-browsers.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
               </tr>
-              <tr>
+              <tr data-block="windows-browsers">
                 <td>Windows &amp; browser (combined)</td>
                 <td>
-                  <a href="{{ site.data_url }}/{{ data_prefix }}/windows-browsers.csv" class="download-data"><span class="usa-label-big">CSV</span></a>
+                  <a href="" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/windows-browsers.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
               </tr>
-              <tr>
+              <!-- <tr>
                 <td>Windows &amp; IE (combined)</td>
                 <td>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/windows-ie.csv" class="download-data"><span class="usa-label-big">CSV</span></a>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/windows-ie.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
-              </tr>
-              <tr>
+              </tr> -->
+              <tr data-block="screen-size">
                 <td>Screen sizes</td>
                 <td>
-                      <a href="{{ site.data_url }}/{{ data_prefix }}/screen-size.csv" class="download-data"><span class="usa-label-big">CSV</span></a>
+                  <a href="" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                       <a href="{{ site.data_url }}/{{ data_prefix }}/screen-size.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
               </tr>
-              <tr>
+              <tr data-block="device_model">
                 <td>Device model</td>
                 <td>
-                      <a href="{{ site.data_url }}/{{ data_prefix }}/device_model.csv" class="download-data"><span class="usa-label-big">CSV</span></a>
+                  <a href="" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                       <a href="{{ site.data_url }}/{{ data_prefix }}/device_model.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
@@ -180,3 +184,65 @@
             </tbody>
           </table>
         </section>
+        <script>
+
+          const handlePrefetch = (url) => {
+            const prefetchLink = document.createElement('link');
+            prefetchLink.rel = 'prefetch';
+            prefetchLink.href = url;
+            document.head.appendChild(prefetchLink);
+          }
+
+          document.querySelectorAll(".csvLink").forEach((link) => {
+            let isFetching = false;
+        
+                const tr = link.closest("tr");
+                const { block } = tr.dataset;
+                const url = `{{ site.data_url }}/{{ data_prefix }}/${block}.json`;
+
+
+            link.addEventListener("mouseenter", () => handlePrefetch(url), { once: true }); 
+
+
+            link.addEventListener("click", (e) => {
+  
+        
+              if (!isFetching) {
+                isFetching = true;
+        
+                
+                link.querySelector("span").innerText = "...";
+                fetch(url)
+                  .then((response) => response.json())
+                  .then((data) => {
+                    // parse json to csv without third-party library
+                    const replacer = (key, value) => value === null ? '' : value; // specify how you want to handle null values here
+                    const header = Object.keys(data.data[0]);
+                    let csv = data.data.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','));
+                    csv.unshift(header.join(','));
+                    csv = csv.join('\r\n');
+                    console.log(csv)
+                    const blob = new Blob([csv], { type: "text/csv" });
+                    const csvUrl = URL.createObjectURL(blob);
+        
+                    // Update the link href and download attributes
+                    link.href = csvUrl;
+                    link.download = `${block}.csv`;
+        
+                    // Trigger a click to start the download
+                    link.click();
+                    link.querySelector("span").innerText = "CSV";
+                    // Reset the flag after the download
+                    isFetching = false;
+                  })
+                  .catch((error) => {
+                    alert("failed to generate CSV. Sorry :/")
+                    console.error('Error fetching data:', error);
+                    // Reset the flag in case of an error
+                    isFetching = false;
+                  });
+              }
+            });
+          });
+        </script>
+        

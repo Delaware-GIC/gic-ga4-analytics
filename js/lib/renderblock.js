@@ -80,9 +80,13 @@ function loadAndRender() {
   function onerror(selection, request) {
     const message = request.responseText;
 
+    console.log(selection); 
+
     selection.classed('error', true)
       .select('.error-message')
       .text(message);
+    
+    selection.select("figure").select(".data").append("span").html("<strong>No data to display.</strong>")
 
     dispatch.error(selection, request, message);
   }
@@ -122,6 +126,7 @@ function loadAndRender() {
 }
 
 function buildBarChart(transformMethod) {
+  
   return loadAndRender()
     .transform(transformMethod)
     .render(barChart()
@@ -139,6 +144,7 @@ function buildBarChartWithLabel(transformMethod, labelKey) {
 }
 
 function buildBarBasicChart(desiredKey) {
+ 
   const method = d => transformers.toTopPercents(d, desiredKey);
   return buildBarChart(method);
 }
