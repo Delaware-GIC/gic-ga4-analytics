@@ -46,6 +46,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta property="og:image" content="{{ site.url }}/images/share-image.png" />
     <script src="{{ site.baseurl }}/js/vendor/d3.v3.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js" integrity="sha512-M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69DQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
 
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -69,6 +70,7 @@
     ga('send', 'pageview');
 
     document.addEventListener("DOMContentLoaded", function(event) {
+
 
       d3.selectAll('.download-data').on('click', function() {
         var link = this.href;
@@ -94,9 +96,9 @@
         ga('send','event','Top-Download File', link, text);
       });
 
-      document.querySelectorAll("[data-source]").forEach((source) => {
-    source.dataset.source = source.dataset.source.split("?")[0] + "?ignoreCache=" + Math.floor(Math.random()*50)
-})
+//       document.querySelectorAll("[data-source]").forEach((source) => {
+//     source.dataset.source = source.dataset.source.split("?")[0] + "?ignoreCache=" + Math.floor(Math.random()*50)
+// })
 
     });
   </script>
@@ -105,7 +107,6 @@
     <script src="{{ site.baseurl }}/js/vendor/aight.v2.min.js"></script>
     <![endif]-->
 
-    <script src="{{ site.baseurl }}/js/vendor/q.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="{{ site.baseurl }}/css/google-fonts.css" rel="stylesheet" />
