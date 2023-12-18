@@ -757,7 +757,7 @@ figure figure {
     
   }
   &.loading::after {
-    content: '...'; 
+    content: ''; 
     font-size: 2rem;
     font-weight: bold; 
     margin: auto; 
