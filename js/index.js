@@ -117,6 +117,12 @@
         if (typeof(totals) === 'undefined') {totals={}; totals.sessions="0";} // Mike Edit
         
         document.querySelector("#current_visitors").innerText = formatCommas(+totals.sessions);
+
+        // hide the time series if totals = 0 
+        if(+totals.sessions === 0) {
+          document.querySelector("#time_series").style.display = "none";
+          document.querySelector(".section_headline.visits_today").style.display = "none";
+        }
       }),
 
     "visitors-hourly": renderBlock()
@@ -239,6 +245,11 @@
 
     "cities": renderBlock()
       .transform(function(d) {
+
+        if(!Array.isArray(d.data)) {
+          document.querySelector("#chart_top-cities-90-days").innerText = "No users currently online."
+          return; 
+        }
         
         let sharesAdded = addShares(d.data, (d) => d.activeUsers);
 
@@ -260,12 +271,13 @@
 
         // Move "Other" to the end of the list
 
+      
         let otherIndex = filteredOtheredData.findIndex((d) => d.city === "Other");
         let other = filteredOtheredData[otherIndex];
         filteredOtheredData.splice(otherIndex, 1);
         filteredOtheredData.push(other);
 
-        return filteredOtheredData
+        return filteredOtheredData.filter(d => d)
       }).render(
         barChart()
           .value(function(d) { return d.share * 100; })
@@ -275,6 +287,12 @@
 
     "countries": renderBlock()
       .transform(function(d) {
+
+        if(!Array.isArray(d.data)) {
+          document.querySelector("#chart_us").innerText = "No users currently online."
+          return; 
+        }
+
         var total_visits = 0;
         var us_visits = 0;
         d.data.forEach(function(c) {
@@ -297,6 +315,11 @@
       ),
     "international_visits": renderBlock()
       .transform(function(d) {
+
+        if(!Array.isArray(d.data)) {
+          document.querySelector("#chart_countries").style.display = "none";
+        }
+
         var countries = addShares(d.data, function(d){ return d.activeUsers; });
         countries = countries.filter(function(c) {
           return c.country != "United States";
