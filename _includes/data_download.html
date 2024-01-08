@@ -37,7 +37,7 @@
           <tbody>
             <tr>
               <td>Visits to all pages over 30 days</td>
-              <td><a class="download-data"><span class="usa-label-big">CSV</span></a></td>
+              <td><a href="#" class="download-data"><span class="usa-label-big">CSV</span></a></td>
               <td>Daily</td>
             </tr>
             <!--<tr>
@@ -86,7 +86,7 @@
             <tr data-block="language">
               <td>Language</td>
               <td>
-                <a class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
+                <a href="#" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                 <a href="{{ site.data_url }}/{{ data_prefix }}/language.json" class="download-data"><span class="usa-label-big">JSON</span></a>
               </td>
               <td>Daily</td>
@@ -105,14 +105,14 @@
             <tr data-block="devices">
               <td>Desktop/mobile/tablet</td>
                 <td>
-                  <a class="csvLink download-data"><span class="usa-label-big">CSV</span></a></td>
+                  <a href="#" class="csvLink download-data"><span class="usa-label-big">CSV</span></a></td>
                 <td>Daily</td>
               </tr>
               <tr data-block="browsers" class="parent">
                 <td>Web browsers</td>
                 <td>
                   <!-- <a class="csvLink" href="{{ site.data_url }}/{{ data_prefix }}/browsers.csv" class="download-data"><span class="usa-label-big">CSV</span></a> -->
-                  <a class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
+                  <a href="#" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/browsers.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
@@ -128,7 +128,7 @@
               <tr data-block="os" class="parent">
                 <td>Operating systems</td>
                 <td>
-                  <a class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
+                  <a href="#" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/os.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
@@ -136,7 +136,7 @@
               <tr data-block="windows" class="subset">
                 <td>Versions of Windows</td>
                 <td>
-                  <a class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
+                  <a href="#" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/windows.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
@@ -144,7 +144,7 @@
               <tr data-block="os-browsers">
                 <td>OS &amp; browser (combined)</td>
                 <td>
-                  <a class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
+                  <a href="#" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/os-browsers.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
@@ -152,7 +152,7 @@
               <tr data-block="windows-browsers">
                 <td>Windows &amp; browser (combined)</td>
                 <td>
-                  <a class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
+                  <a href="#" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                   <a href="{{ site.data_url }}/{{ data_prefix }}/windows-browsers.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
@@ -168,7 +168,7 @@
               <tr data-block="screen-size">
                 <td>Screen sizes</td>
                 <td>
-                  <a class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
+                  <a href="#" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                       <a href="{{ site.data_url }}/{{ data_prefix }}/screen-size.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
@@ -176,7 +176,7 @@
               <tr data-block="device_model">
                 <td>Device model</td>
                 <td>
-                  <a class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
+                  <a href="#" class="csvLink download-data"><span class="usa-label-big">CSV</span></a>
                       <a href="{{ site.data_url }}/{{ data_prefix }}/device_model.json" class="download-data"><span class="usa-label-big">JSON</span></a>
                 </td>
                 <td>Daily</td>
@@ -184,6 +184,13 @@
             </tbody>
           </table>
         </section>
+
+        <style>
+          .csvLink:hover {
+            cursor: pointer; 
+          }
+        </style>
+
         <script>
 
           const handlePrefetch = (url) => {
@@ -207,7 +214,8 @@
 
             link.addEventListener("click", (e) => {
   
-        
+              // e.preventDefault(); 
+
               if (!isFetching) {
                 isFetching = true;
         
@@ -227,7 +235,7 @@
         
                     // Update the link href and download attributes
                     link.href = csvUrl;
-                    link.download = `${block}.csv`;
+                    link.download = `${block}-{{ data_prefix }}.csv`;
         
                     // Trigger a click to start the download
                     link.click();
