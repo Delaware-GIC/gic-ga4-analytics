@@ -145,7 +145,7 @@
                 return formatHour(d.hour);
               })
               .title(function(d) {
-                return formatCommas(d.visits)
+                return formatCommas(d.sessions)
                   + " visits during the hour of "
                   + formatHour(d.hour) + "m";
               });
@@ -203,8 +203,6 @@
          * users.json, we total up the device numbers to get the "big
          * number", saving us an extra XHR load.
          */
-        console.log("DEVICES HAS RENDERED!!! ")
-        console.log(data)
         let total = data.reduce((acc, curr) => acc + curr.value, 0);    
         document.querySelector("#total_visitors").innerText = formatBigNumber(total);
       }),
@@ -241,7 +239,6 @@
 
     "cities": renderBlock()
       .transform(function(d) {
-        // remove "(not set) from the data"
         
         let sharesAdded = addShares(d.data, (d) => d.activeUsers);
 
@@ -1016,6 +1013,9 @@
     // console.log("%cThis is an open source, public domain project, and your contributions are very welcome.", styles.medium);
 
   }
+
+
+
 
 // Set the dropdown
 var dropDown = document.getElementById('agency-selector');
