@@ -1,5 +1,5 @@
   {% if page.url == '/' %}
-    {% assign data_prefix = 'live' %}
+    {% assign data_prefix = 'all' %}
     {% assign entity = "Delaware agency" %}
     {% assign plural = "s" %}
     {% assign the = '' %}
@@ -30,8 +30,9 @@
           data-source="{{ site.data_url }}/{{ data_prefix }}/visitors-today.json"
           data-refresh="15">
           <h2 id="current_visitors" class="data">...</h2>
-          <div class="chart_subtitle">people have visited {{ the }}{{ entity }} website{{ plural }} today</div>
+          <div style="text-align:center" class="chart_subtitle">people have visited {{ the }}{{ entity }} website{{ plural }} today</div>
         </section>
+        
 
         <section class="section_headline visits_today">
           <h3>Visits Today</h3>

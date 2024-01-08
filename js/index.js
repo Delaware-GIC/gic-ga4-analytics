@@ -341,7 +341,9 @@
     // the top pages block(s)
     "top-pages": renderBlock()
       .transform(function(d) {        
-        return d.data.filter(d => !EXCLUSIONS_LIST.includes(d.pageTitle)).slice(0,20);
+        return d.data.filter(d => !EXCLUSIONS_LIST.includes(d.pageTitle))
+        .sort((a, b) => +a.totalUsers > +b.totalUsers ? -1 : 1)
+        .slice(0,20);
       })
       .on("render", function(selection, data) {
         // turn the labels into links
