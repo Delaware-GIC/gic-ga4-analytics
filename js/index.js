@@ -1056,6 +1056,14 @@ for (var j = 0; j < dropDown.options.length; j++) {
   }
 }
 
+window.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("section, figure").forEach((node) => {
+    if(node.dataset.source) {
+      node.dataset.source += `?ignoreCache=${Math.ceil(Math.random()*100)}`
+    }
+  })
+})
+
 
 
 })(this);
