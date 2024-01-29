@@ -19,25 +19,25 @@ plural = "" %} {% assign the = "the " %} {% endif %}
       -->
 <div id="main_data" class="width-two-thirds">
   <section
-    id="visitors-today"
-    data-block="visitors-today"
-    data-source="{{ site.data_url }}/{{ data_prefix }}/visitors-today.json"
+    id="users-30-days"
+    data-block="users-30-days"
+    data-source="{{ site.data_url }}/{{ data_prefix }}/total-users-30-days.json"
     data-refresh="15"
   >
-    <h2 id="current_visitors" class="data">...</h2>
+    <h2 id="visitors-30-days" class="data">...</h2>
     <div style="text-align: center" class="chart_subtitle">
-      people have visited {{ the }}{{ entity }} website{{ plural }} today
+      people have visited {{ the }}{{ entity }} website{{ plural }} in the past 30 days
     </div>
   </section>
 
   <section class="section_headline visits_today">
-    <h3>Visits Today</h3>
+    <h3>Visits Over the Past 30 Days</h3>
     <h4>Eastern Time</h4>
   </section>
   <section
     id="time_series"
-    data-block="visitors-hourly"
-    data-source="{{ site.data_url }}/{{ data_prefix }}/visitors-hourly.json"
+    data-block="users-30-days-series"
+    data-source="{{ site.data_url }}/{{ data_prefix }}/total-users-30-days.json"
     data-refresh="15"
   >
     <svg class="data time-series"></svg>
@@ -159,7 +159,7 @@ plural = "" %} {% assign the = "the " %} {% endif %}
     <!-- see: http://heydonworks.com/practical_aria_examples/ -->
     <h3>Top <span id="top_table_type">Pages</span></h3>
     <ul class="pills" role="tablist">
-      <li>
+      <!-- <li>
         <a
           role="tab"
           data-type="Pages"
@@ -168,10 +168,11 @@ plural = "" %} {% assign the = "the " %} {% endif %}
           class="site-nav"
           >Today</a
         >
-      </li>
+      </li> -->
       <li>
         <a
           role="tab"
+          aria-selected="true"
           data-type="Domains"
           href="#top-pages-7-days"
           class="site-nav"
@@ -189,7 +190,7 @@ plural = "" %} {% assign the = "the " %} {% endif %}
       </li>
     </ul>
 
-    <figure
+    <!-- <figure
       class="top-pages"
       id="top-pages-today"
       role="tabpanel"
@@ -204,7 +205,7 @@ plural = "" %} {% assign the = "the " %} {% endif %}
         >
       </h5>
       <div class="data bar-chart"></div>
-    </figure>
+    </figure> -->
 
     <figure
       class="top-pages"

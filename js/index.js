@@ -45,6 +45,10 @@
             : formatCommas(visits);
         };
       },
+      dateFromString = function(dateString) {
+        const date = dateString.slice(0,4) + "-" + dateString.slice(4,6) + "-" + dateString.slice(6);
+        return d3.time.format.utc("%b %d")(new Date(date))
+      },
       formatVisits = formatPrefix({
         "k": ["k", 1], // thousands
         "M": ["m", 1], // millions
@@ -124,7 +128,42 @@
           document.querySelector(".section_headline.visits_today").style.display = "none";
         }
       }),
+    "users-30-days": renderBlock().
+      transform((data) => {
+        
+        const total = data.data.reduce((acc, curr) => acc += curr.totalUsers, 0); 
 
+        document.querySelector("#visitors-30-days").innerText = formatCommas(total);
+      }),
+    "users-30-days-series": renderBlock().
+      transform((data) => {
+        return data.data.map(d => ({ 
+         "date": dateFromString(d.date),
+         "totalUsers": +d.totalUsers
+        })).sort((a, b) => a.date > b.date ? 1 : -1);
+      })
+      .render((svg, data) => {
+        console.log(data)
+        let days = data; 
+        let y = (d) => d.totalUsers; 
+        let series = timeSeries()
+          .series([days])
+          .y(y)
+          .label(function(d) {
+            return d.date
+          })
+          .title(function(d) {
+            return `${d.totalUsers.toLocaleString()} total visitors on ${d.date}`
+          });
+
+        series.xScale()
+          .domain(d3.range(0, days.length + 1));
+        
+        series.yScale()
+          .domain([0, d3.max(days, y)]);
+        svg.call(series)
+      })
+    ,
     "visitors-hourly": renderBlock()
       .transform(function(data) {
 
