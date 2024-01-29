@@ -338,6 +338,14 @@ section {
       font-size: 6em;
     }
   }
+  #visitors-30-days {
+    font-size: 6em;
+    margin: 0;
+    text-align: center;
+    @include media($small-screen) {
+      font-size: 6em;
+    }
+  }
   h3 {
     margin: 10px 0;
   }
@@ -520,6 +528,21 @@ section {
   .axis[aria-hidden=true] {
     display: block !important; // WDS override
   }
+  .label {
+    font-size: .7rem; 
+    transform: rotate(30deg) translate(6px, -6px);
+  }
+  & rect {
+    transition: .2s ease opacity; 
+    cursor: pointer; 
+    &:hover {
+     opacity: .85; 
+      & ~ text.label {
+        font-weight: 600; 
+      }
+    }
+     
+   }
 }
 
 #current_visitors {
@@ -554,18 +577,16 @@ figure {
 }
 
 ul.pills {
-  @include clearfix;
-  @include span-columns(5 of 5);
-  display: inline-block;
 
+  display: flex; 
   border-right: 1px solid $gray;
   border-left: 1px solid $gray;
 
   li {
-    width: 33.3333%;
+    width: 100%; 
   }
 
-  &, & > li {
+  & > li {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -577,7 +598,7 @@ ul.pills {
   }
 
   & > li {
-    float: left;
+    
 
     & > a {
       color: $dark-blue;
