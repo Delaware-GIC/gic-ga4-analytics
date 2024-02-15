@@ -56,7 +56,7 @@ url: https://staging.analytics-delaware.pages.dev/
 dropdown_title: All Participating State Agencies
 
 # Default data url (also needs to be in nginx.conf for cloud.gov deployment)
-data_url: https://storage.googleapis.com/degic/test
+data_url: https://storage.googleapis.com/degic
 # data_url: http://localhost:3000
 
 # twitter information
