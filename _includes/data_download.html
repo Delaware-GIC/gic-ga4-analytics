@@ -1,7 +1,7 @@
       {% if page.url == '/data/' %}
         {% capture page_title %}  - Data{% endcapture %}
-        {% assign data_prefix = 'portal' %}
-        {% assign entity = "Delaware.gov" %}
+        {% assign data_prefix = 'all' %}
+        {% assign entity = "All Participating State Agencies" %}
       {% else %}
         {% capture page_title %} - {{ page.name }} - Data{% endcapture %}
         {% assign data_prefix = page.slug %}
