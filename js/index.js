@@ -45,6 +45,10 @@
             : formatCommas(visits);
         };
       },
+      dateFromString = function(dateString) {
+        const date = dateString.slice(0,4) + "-" + dateString.slice(4,6) + "-" + dateString.slice(6);
+        return d3.time.format.utc("%b %d")(new Date(date))
+      },
       formatVisits = formatPrefix({
         "k": ["k", 1], // thousands
         "M": ["m", 1], // millions
@@ -60,7 +64,7 @@
       formatPercent = function(p) {
         return p >= .1
           ? trimZeroes(p.toFixed(1)) + "%"
-          : "< 0.1%";
+          : "<0.1%"
       },
       formatHour = function(hour) {
         var n = +hour,
@@ -117,8 +121,48 @@
         if (typeof(totals) === 'undefined') {totals={}; totals.sessions="0";} // Mike Edit
         
         document.querySelector("#current_visitors").innerText = formatCommas(+totals.sessions);
-      }),
 
+        // hide the time series if totals = 0 
+        if(+totals.sessions === 0) {
+          document.querySelector("#time_series").style.display = "none";
+          document.querySelector(".section_headline.visits_today").style.display = "none";
+        }
+      }),
+    "users-30-days": renderBlock().
+      transform((data) => {
+        
+        const total = data.data.reduce((acc, curr) => acc += curr.totalUsers, 0); 
+
+        document.querySelector("#visitors-30-days").innerText = formatCommas(total);
+      }),
+    "users-30-days-series": renderBlock().
+      transform((data) => {
+        return data.data.map(d => ({ 
+         "date": dateFromString(d.date),
+         "totalUsers": +d.totalUsers
+        }))
+      })
+      .render((svg, data) => {
+        let days = data; 
+        let y = (d) => d.totalUsers; 
+        let series = timeSeries()
+          .series([days])
+          .y(y)
+          .label(function(d) {
+            return d.date
+          })
+          .title(function(d) {
+            return `${d.totalUsers.toLocaleString()} total visitors on ${d.date}`
+          });
+
+        series.xScale()
+          .domain(d3.range(0, days.length + 1));
+        
+        series.yScale()
+          .domain([0, d3.max(days, y)]);
+        svg.call(series)
+      })
+    ,
     "visitors-hourly": renderBlock()
       .transform(function(data) {
 
@@ -145,7 +189,7 @@
                 return formatHour(d.hour);
               })
               .title(function(d) {
-                return formatCommas(d.visits)
+                return formatCommas(d.sessions)
                   + " visits during the hour of "
                   + formatHour(d.hour) + "m";
               });
@@ -171,7 +215,7 @@
       })
       .render(barChart()
         .value(function(d) { return d.share * 100; })
-        .format(formatPercent)),
+        .format((d) => formatPercent(d.share*100))),
 
     // the windows block is a stack layout
     "windows": renderBlock()
@@ -182,7 +226,7 @@
       })
       .render(barChart()
         .value(function(d) { return d.share * 100; })
-        .format(formatPercent)),
+        .format((d) => formatPercent(d.share*100))),
 
     // the devices block is a stack layout
     "devices": renderBlock()
@@ -196,15 +240,13 @@
         .label(function(d) { return d.key; })
         .value(function(d) { 
           return d.pct * 100; })
-        .format(formatPercent))
+        .format((d) => formatPercent(d.pct * 100)))
       .on("render", function(selection, data) {
         /*
          * XXX this is an optimization. Rather than loading
          * users.json, we total up the device numbers to get the "big
          * number", saving us an extra XHR load.
          */
-        console.log("DEVICES HAS RENDERED!!! ")
-        console.log(data)
         let total = data.reduce((acc, curr) => acc + curr.value, 0);    
         document.querySelector("#total_visitors").innerText = formatBigNumber(total);
       }),
@@ -223,7 +265,7 @@
       .render(barChart()
         .label(function(d) { return d.key; })
         .value(function(d) { return d.pct * 100; })
-        .format(formatPercent)),
+        .format((d) => formatPercent(d.pct*100))),
 
     // the IE block is a stack, but with some extra work done to transform the
     // data beforehand to match the expected object format
@@ -236,17 +278,21 @@
       .render(
         barChart()
           .value(function(d) { return d.share * 100; })
-          .format(formatPercent)
+          .format((d) => formatPercent(d.share*100))
       ),
 
     "cities": renderBlock()
       .transform(function(d) {
-        // remove "(not set) from the data"
+
+        if(!Array.isArray(d.data)) {
+          document.querySelector("#chart_top-cities-90-days").innerText = "No users currently online."
+          return; 
+        }
         
         let sharesAdded = addShares(d.data, (d) => d.activeUsers);
 
         let filteredOtheredData = sharesAdded.reduce((acc, curr) => {
-            if(acc.length < 9 && !EXCLUSIONS_LIST.includes(curr.city)) {
+            if(acc.length < 14 && !EXCLUSIONS_LIST.includes(curr.city)) {
               acc.push(curr); 
             } else {
                 let otherIndex = acc.findIndex((d) => d.city === "Other"); 
@@ -263,21 +309,29 @@
 
         // Move "Other" to the end of the list
 
+      
         let otherIndex = filteredOtheredData.findIndex((d) => d.city === "Other");
         let other = filteredOtheredData[otherIndex];
         filteredOtheredData.splice(otherIndex, 1);
-        filteredOtheredData.push(other);
+        filteredOtherData = filteredOtheredData.sort((a, b) => b.share - a.share);
+        filteredOtherData.push(other);
 
-        return filteredOtheredData
+        return filteredOtheredData.filter(d => d)
       }).render(
         barChart()
           .value(function(d) { return d.share * 100; })
           .label(function(d) { return d.city; })
-          .format(formatPercent)
+          .format((d) => ` ${d.activeUsers} (${formatPercent(d.share * 100)})`)
       ),
 
     "countries": renderBlock()
       .transform(function(d) {
+
+        if(!Array.isArray(d.data)) {
+          document.querySelector("#chart_us").innerText = "No users currently online."
+          return; 
+        }
+
         var total_visits = 0;
         var us_visits = 0;
         d.data.forEach(function(c) {
@@ -295,22 +349,27 @@
       })
       .render(
         barChart()
-          .value(function(d) {return d.share * 100; })
-          .format(formatPercent)
+          .value(function(d) { return d.share * 100; })
+          .format((d) => ` ${d.value} (${formatPercent(d.share * 100)})`)
       ),
     "international_visits": renderBlock()
       .transform(function(d) {
+
+        if(!Array.isArray(d.data)) {
+          document.querySelector("#chart_countries").style.display = "none";
+        }
+
         var countries = addShares(d.data, function(d){ return d.activeUsers; });
         countries = countries.filter(function(c) {
-          return c.country != "United States";
+          return c.country != "United States" && c.country;
         });
-        return countries.slice(0, 15);
+        return countries.slice(0, 15).sort((a, b) => b.share - a.share);
       })
       .render(
         barChart()
           .value(function(d) { return d.share * 100; })
           .label(function(d) { return d.country; })
-          .format(formatPercent)
+          .format((d) => formatPercent(d.share*100))
       ),
 
     "top-downloads": renderBlock()
@@ -335,7 +394,7 @@
               .domain([0, 1, d3.max(values)])
               .rangeRound([0, 1, 100]);
           })
-          .format(formatCommas)
+          .format((d) => formatCommas(+d.total_events))
       ),
 
     // the top pages block(s)
@@ -343,7 +402,7 @@
       .transform(function(d) {        
         return d.data.filter(d => !EXCLUSIONS_LIST.includes(d.pageTitle))
         .sort((a, b) => +a.totalUsers > +b.totalUsers ? -1 : 1)
-        .slice(0,20);
+        .slice(0,40);
       })
       .on("render", function(selection, data) {
         // turn the labels into links
@@ -370,7 +429,7 @@
             .domain([0, 1, d3.max(values)])
             .rangeRound([0, 1, 100]);
         })
-        .format(formatCommas)),
+        .format((d) => formatCommas(+d.totalUsers))),
 
     // the top pages block(s)
     "top-pages-realtime": renderBlock()
@@ -409,7 +468,7 @@
             .domain([0, 1, d3.max(values)])
             .rangeRound([0, 1, 100]);
         })
-        .format(formatCommas)),
+        .format((d) => formatCommas(+d.totalUsers))),
 
   };
 
@@ -652,7 +711,9 @@
         value = function(d) {
           return d.value;
         },
-        format = String,
+        format = function(d) { 
+          return d.value;
+        },
         label = function(d) {
           return d.key;
         },
@@ -693,7 +754,7 @@
       
       bin.select(".label").html(label);
       bin.select(".value").text(function(d, i) {
-        return format.call(this, value(d), d, i);
+        return format.call(this, d);
       });
     };
 
@@ -993,29 +1054,32 @@
   // friendly console message
 
   // plain text for IE
-  if (window._ie) {
-    console.log("Hi! Please poke around to your heart's content.");
-    console.log("");
-    console.log("If you find a bug or something, please report it at https://github.com/GSA/analytics.usa.gov/issues");
-    console.log("Like it, but want a different front-end? The data reporting is its own tool: https://github.com/18f/analytics-reporter");
-    console.log("This is an open source, public domain project, and your contributions are very welcome.");
-  }
+  // if (window._ie) {
+  //   console.log("Hi! Please poke around to your heart's content.");
+  //   console.log("");
+  //   console.log("If you find a bug or something, please report it at https://github.com/GSA/analytics.usa.gov/issues");
+  //   console.log("Like it, but want a different front-end? The data reporting is its own tool: https://github.com/18f/analytics-reporter");
+  //   console.log("This is an open source, public domain project, and your contributions are very welcome.");
+  // }
 
-  // otherwise, let's get fancy
-  else {
-    var styles = {
-      big: "font-size: 24pt; font-weight: bold;",
-      medium: "font-size: 10pt",
-      medium_bold: "font-size: 10pt; font-weight: bold",
-      medium_link: "font-size: 10pt; font-weight: bold; color: #18f",
-    };
-    // console.log("%cHi! Please poke around to your heart's content.", styles.big);
-    // console.log(" ");
-    // console.log("%cIf you find a bug or something, please report it over at %chttps://github.com/GSA/analytics.usa.gov/issues", styles.medium, styles.medium_link);
-    // console.log("%cLike it, but want a different front-end? The data reporting is its own tool: %chttps://github.com/18f/analytics-reporter", styles.medium, styles.medium_link);
-    // console.log("%cThis is an open source, public domain project, and your contributions are very welcome.", styles.medium);
+  // // otherwise, let's get fancy
+  // else {
+  //   var styles = {
+  //     big: "font-size: 24pt; font-weight: bold;",
+  //     medium: "font-size: 10pt",
+  //     medium_bold: "font-size: 10pt; font-weight: bold",
+  //     medium_link: "font-size: 10pt; font-weight: bold; color: #18f",
+  //   };
+  //   // console.log("%cHi! Please poke around to your heart's content.", styles.big);
+  //   // console.log(" ");
+  //   // console.log("%cIf you find a bug or something, please report it over at %chttps://github.com/GSA/analytics.usa.gov/issues", styles.medium, styles.medium_link);
+  //   // console.log("%cLike it, but want a different front-end? The data reporting is its own tool: %chttps://github.com/18f/analytics-reporter", styles.medium, styles.medium_link);
+  //   // console.log("%cThis is an open source, public domain project, and your contributions are very welcome.", styles.medium);
 
-  }
+  // }
+
+
+
 
 // Set the dropdown
 var dropDown = document.getElementById('agency-selector');
@@ -1032,6 +1096,14 @@ for (var j = 0; j < dropDown.options.length; j++) {
     break;
   }
 }
+
+window.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("section, figure").forEach((node) => {
+    if(node.dataset.source) {
+      node.dataset.source += `?ignoreCache=${Math.ceil(Math.random()*100)}`
+    }
+  })
+})
 
 
 
