@@ -50,13 +50,12 @@ title: "analytics.delaware.gov | The State of Delaware's web traffic."
 description: "Official data on web traffic to dozens of Delaware government websites."
 
 # Site's own URL
-url: https://staging.analytics-delaware.pages.dev/
+url: https://gic-ga4-analytics.pages.dev/
 
 # Default dropdown title, will not appear if there are no sub-pages
 dropdown_title: All Participating State Agencies
 
 # Default data url (also needs to be in nginx.conf for cloud.gov deployment)
-#data_url: https://storage.googleapis.com/degic
 data_url: https://storage.googleapis.com/gic-ga4-analytics
 
 # data_url: http://localhost:3000
