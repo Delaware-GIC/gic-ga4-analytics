@@ -90,6 +90,8 @@ plural = "" %} {% assign the = "the " %} {% endif %}
           </figure> -->
   </section>
 
+
+
   <section id="operating_systems" class="three_column">
     <h4>Operating Systems</h4>
 
@@ -148,6 +150,18 @@ plural = "" %} {% assign the = "the " %} {% endif %}
       data-source="{{ site.data_url }}/{{ data_prefix }}/top-countries-realtime.json"
     >
       <h4>International &amp; Territories</h4>
+      <div class="data bar-chart"></div>
+    </figure>
+  </section>
+  
+  <section id="language" class="three_column">
+    <h4>Languages</h4>
+
+    <figure
+      id="chart_language"
+      data-block="language"
+      data-source="{{ site.data_url }}/{{ data_prefix }}/language.json"
+    >
       <div class="data bar-chart"></div>
     </figure>
   </section>
