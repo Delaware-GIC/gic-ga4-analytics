@@ -1,8 +1,7 @@
 
-url: https://staging.analytics-delaware.pages.dev/
+url: https://gic-ga4-analytics.pages.dev/
 # Use production data by default.
 # To pull from dev data for home page, uncomment:
-#data_url: https://storage.googleapis.com/degic
 data_url: https://storage.googleapis.com/gic-ga4-analytics
 
 # data_url: http://localhost:3000
