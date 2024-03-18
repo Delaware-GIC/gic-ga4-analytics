@@ -82,6 +82,8 @@ export default {
   // data beforehand to match the expected object format
   ie: renderBlock.buildBarBasicChart('ie_version'),
 
+ // language: renderBlock.buildBarBasicChart('language'),
+
   cities: renderBlock.buildBarChartWithLabel((d) => {
     // remove "(not set) from the data"
     const cityList = d.data;

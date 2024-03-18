@@ -101,6 +101,17 @@
 
       const makeTotal = (data, totalKey, groupKey) => {
 
+        data = data.map(dict => {
+         // console.log("I was here first")
+          // Check if 'language' property exists and its value is '(other)'
+          if (dict.hasOwnProperty('language') && dict['language'] === '(other)') {
+              // If true, change the value to 'unknown'
+          //   console.log("I was here")
+              dict['language'] = 'unknown';
+          }
+          return dict;
+      });
+
         const uniqueKeys = [...new Set(data.map(d => d[groupKey]))]; 
 
         return uniqueKeys.map((key) => ({
@@ -280,6 +291,17 @@
           .value(function(d) { return d.share * 100; })
           .format((d) => formatPercent(d.share*100))
       ),
+
+    // the language block
+    "language": renderBlock()
+    .transform(function(d) {
+      let values = makeTotal(d.data, "sessions", "language"); 
+      let total = d3.sum(values.map(function(d) { return d.value; }));
+      return addShares(collapseOther(values, total * .001));
+    })
+    .render(barChart()
+      .value(function(d) { return d.share * 100; })
+      .format((d) => formatPercent(d.share*100))),
 
     "cities": renderBlock()
       .transform(function(d) {
