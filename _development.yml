@@ -1,5 +1,5 @@
 
-url: https://gic-ga4-analytics.pages.dev/
+url: https://analytics.delaware.gov/
 # Use production data by default.
 # To pull from dev data for home page, uncomment:
 data_url: https://storage.googleapis.com/gic-ga4-analytics
