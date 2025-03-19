@@ -21,7 +21,7 @@ plural = "" %} {% assign the = "the " %} {% endif %}
   <section
     id="users-30-days"
     data-block="users-30-days"
-    data-source="{{ site.data_url }}/{{ data_prefix }}/total-users-30-days.json"
+    data-source="{{ site.data_url }}/{{ data_prefix }}/total-users-30-days.json?nocache={{ 'now' | date: '%s' }}""
     data-refresh="15"
   >
     <h2 id="visitors-30-days" class="data">...</h2>
@@ -36,7 +36,7 @@ plural = "" %} {% assign the = "the " %} {% endif %}
   <section
     id="time_series"
     data-block="users-30-days-series"
-    data-source="{{ site.data_url }}/{{ data_prefix }}/total-users-30-days.json"
+    data-source="{{ site.data_url }}/{{ data_prefix }}/total-users-30-days.json?nocache={{ 'now' | date: '%s' }}""
     data-refresh="15"
   >
     <svg class="data time-series"></svg>
