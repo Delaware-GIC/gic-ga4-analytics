@@ -152,7 +152,7 @@
          "date": dateFromString(d.date),
          "totalUsers": +d.totalUsers
         }))
-        .sort((a, b) => a.date - b.date) // to sort based on months in the 30 days series graph
+        .sort((a, b) => new Date(a.date) - new Date(b.date)) // to sort based on months in the 30 days series graph
       })
       .render((svg, data) => {
         let days = data; 
